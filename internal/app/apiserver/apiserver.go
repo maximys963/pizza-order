@@ -1,9 +1,11 @@
 package apiserver
 
 import (
+	"encoding/json"
 	"github.com/gorilla/mux"
 	"github.com/sirupsen/logrus"
 	"io"
+	"log"
 	"net/http"
 )
 
@@ -45,7 +47,25 @@ func (s *APIServer) configureLogger() error {
 }
 
 func (s *APIServer) configureRouter() {
-	s.router.HandleFunc("/hello", s.handleHello())
+	s.router.HandleFunc("/hello", s.handleHello()).Methods("GET")
+	s.router.HandleFunc("/order", s.handleOrder()).Methods("POST")
+}
+
+func (s *APIServer) handleOrder() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		resp := make(map[string]string)
+		resp["message"] = "You successfully create pizza order"
+
+		respJson, err := json.Marshal(resp)
+
+		if err != nil {
+			log.Fatalf("Error happened in JSON marshal. Err: %s", err)
+		}
+
+		w.WriteHeader(200)
+		w.Write(respJson)
+		return
+	}
 }
 
 func (s *APIServer) handleHello() http.HandlerFunc {
