@@ -47,8 +47,10 @@ func (s *APIServer) configureLogger() error {
 }
 
 func (s *APIServer) configureRouter() {
-	s.router.HandleFunc("/hello", s.handleHello()).Methods("GET")
-	s.router.HandleFunc("/order", s.handleOrder()).Methods("POST")
+	s.router.HandleFunc("/film", s.addFilm()).Methods("POST")
+	s.router.HandleFunc("/films/from-file", s.importFilm()).Methods("POST")
+	s.router.HandleFunc("/film/:filmId", s.deleteFilm()).Methods("DELETE")
+	s.router.HandleFunc("/films", s.getFilms()).Methods("GET")
 }
 
 func (s *APIServer) handleOrder() http.HandlerFunc {
@@ -68,8 +70,26 @@ func (s *APIServer) handleOrder() http.HandlerFunc {
 	}
 }
 
-func (s *APIServer) handleHello() http.HandlerFunc {
+func (s *APIServer) addFilm() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		io.WriteString(w, "Hello")
+	}
+}
+
+func (s *APIServer) importFilm() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		io.WriteString(w, "film imported")
+	}
+}
+
+func (s *APIServer) deleteFilm() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		io.WriteString(w, "film deleted")
+	}
+}
+
+func (s *APIServer) getFilms() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		io.WriteString(w, "all films")
 	}
 }

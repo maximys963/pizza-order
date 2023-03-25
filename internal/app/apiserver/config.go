@@ -10,5 +10,4 @@ func NewConfig() *Config {
 		BindAddr: ":8080*",
 		LogLevel: "debug",
 	}
-
 }
