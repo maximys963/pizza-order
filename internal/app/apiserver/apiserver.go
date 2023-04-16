@@ -6,6 +6,7 @@ import (
 	"github.com/gorilla/mux"
 	"github.com/maximys963/pizza-order/models"
 	"github.com/maximys963/pizza-order/pkg/config"
+	"github.com/maximys963/pizza-order/routes"
 	"github.com/sirupsen/logrus"
 	"io"
 	"net/http"
@@ -31,7 +32,6 @@ func (s *APIServer) Start() error {
 	}
 
 	s.configureRouter()
-
 	s.logger.Info("Starting api server")
 
 	return http.ListenAndServe(s.config.BindAddr, s.router)
@@ -49,10 +49,7 @@ func (s *APIServer) configureLogger() error {
 }
 
 func (s *APIServer) configureRouter() {
-	s.router.HandleFunc("/film", s.addFilm()).Methods("POST")
-	s.router.HandleFunc("/films/from-file", s.importFilm()).Methods("POST")
-	s.router.HandleFunc("/film/{filmId}", s.deleteFilm()).Methods("DELETE")
-	s.router.HandleFunc("/films", s.getFilms()).Methods("GET")
+	routes.RegisterFilmsRoutes(s.router)
 }
 
 func (s *APIServer) addFilm() http.HandlerFunc {
