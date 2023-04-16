@@ -2,10 +2,12 @@ package apiserver
 
 import (
 	"encoding/json"
+	"fmt"
 	"github.com/gorilla/mux"
+	"github.com/maximys963/pizza-order/models"
+	"github.com/maximys963/pizza-order/pkg/config"
 	"github.com/sirupsen/logrus"
 	"io"
-	"log"
 	"net/http"
 )
 
@@ -53,26 +55,31 @@ func (s *APIServer) configureRouter() {
 	s.router.HandleFunc("/films", s.getFilms()).Methods("GET")
 }
 
-func (s *APIServer) handleOrder() http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
-		resp := make(map[string]string)
-		resp["message"] = "You successfully create pizza order"
-
-		respJson, err := json.Marshal(resp)
-
-		if err != nil {
-			log.Fatalf("Error happened in JSON marshal. Err: %s", err)
-		}
-
-		w.WriteHeader(200)
-		w.Write(respJson)
-		return
-	}
-}
-
 func (s *APIServer) addFilm() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		io.WriteString(w, "Hello")
+		var db = config.GetDatabase()
+
+		w.Header().Set("Content-Type", "application/json")
+		var film models.Film
+		_ = json.NewDecoder(r.Body).Decode(&film)
+
+		result := db.Create(film)
+
+		if result.Error != nil {
+			logrus.Error(result.Error)
+			return
+		}
+
+		marshaledJson, err := json.Marshal(film)
+
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusOK)
+		w.Write(marshaledJson)
 	}
 }
 
@@ -88,8 +95,33 @@ func (s *APIServer) deleteFilm() http.HandlerFunc {
 	}
 }
 
+// TODO: move it to controller
+
+// TODO: create repository
+
 func (s *APIServer) getFilms() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		io.WriteString(w, "all films")
+		var films []models.Film
+
+		var db = config.GetDatabase()
+		result := db.Find(&films)
+
+		if result.Error != nil {
+			s.logger.Error(result.Error)
+			w.WriteHeader(http.StatusServiceUnavailable)
+		}
+
+		marshaledJson, err := json.Marshal(films)
+
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+
+		fmt.Print(marshaledJson)
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusOK)
+		w.Write(marshaledJson)
+
 	}
 }

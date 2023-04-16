@@ -18,9 +18,6 @@ func GetEnvOrFail(envName string) string {
 
 func CreateDBConnection(
 	dbConnectionURL string,
-	// dbConnectionLifeTimeInMinutes,
-	// dbConnectionMaxIdleConnections,
-	// dbConnectionMaxOpenConnections int,
 ) (*gorm.DB, error) {
 	db, err := gorm.Open(postgres.Open(dbConnectionURL), &gorm.Config{
 		SkipDefaultTransaction: true,
@@ -34,10 +31,6 @@ func CreateDBConnection(
 	if dbErr != nil {
 		return nil, err
 	}
-
-	//rawDB.SetConnMaxLifetime(time.Duration(dbConnectionLifeTimeInMinutes) * time.Minute)
-	//rawDB.SetMaxIdleConns(dbConnectionMaxIdleConnections)
-	//rawDB.SetMaxOpenConns(dbConnectionMaxOpenConnections)
 
 	return db, err
 }

@@ -6,8 +6,8 @@ import (
 	"github.com/BurntSushi/toml"
 	"github.com/joho/godotenv"
 	"github.com/maximys963/pizza-order/internal/app/apiserver"
+	"github.com/maximys963/pizza-order/pkg/config"
 	"github.com/maximys963/pizza-order/util"
-	"gorm.io/gorm"
 	"log"
 )
 
@@ -15,26 +15,16 @@ var (
 	configPath string
 )
 
-func onceInitDBOnboardingConnection() *gorm.DB {
-	var (
-		host     = util.GetEnvOrFail("HOST")
-		port     = util.GetEnvOrFail("PORT")
-		user     = util.GetEnvOrFail("DB_USER")
-		password = util.GetEnvOrFail("DB_PASS")
-		dbname   = "films_db"
-	)
-	dbUrl := fmt.Sprintf("host=%s port=%s user=%s "+
-		"password=%s dbname=%s sslmode=disable",
-		host, port, user, password, dbname)
+func initDBConnection() {
+	var dbConfig config.DBConfig
 
-	connection, err := util.CreateDBConnection(
-		dbUrl,
-	)
-	if err != nil {
-		log.Panic(err)
-	}
+	dbConfig.Host = util.GetEnvOrFail("HOST")
+	dbConfig.Port = util.GetEnvOrFail("PORT")
+	dbConfig.User = util.GetEnvOrFail("DB_USER")
+	dbConfig.Password = util.GetEnvOrFail("DB_PASS")
+	dbConfig.DbName = "films_db"
 
-	return connection
+	config.Connect(dbConfig)
 }
 
 func init() {
@@ -55,7 +45,7 @@ func main() {
 	initEnv()
 	flag.Parse()
 
-	onceInitDBOnboardingConnection()
+	initDBConnection()
 
 	config := apiserver.NewConfig()
 	_, err := toml.DecodeFile(configPath, config)
