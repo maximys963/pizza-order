@@ -1,11 +1,47 @@
 package controllers
 
-import "net/http"
+import (
+	"encoding/json"
+	"github.com/maximys963/pizza-order/models"
+	"net/http"
+)
 
-func AddFilm(w http.ResponseWriter, r *http.Request) {}
+func AddFilmHandler(w http.ResponseWriter, r *http.Request) {
+	var film models.Film
+	_ = json.NewDecoder(r.Body).Decode(&film)
 
-func ImportFilm(w http.ResponseWriter, r *http.Request) {}
+	var addedFilm = models.AddFilm()
 
-func DeleteFilm(w http.ResponseWriter, r *http.Request) {}
+	marshaledJson, err := json.Marshal(addedFilm)
 
-func GetFilms(w http.ResponseWriter, r *http.Request) {}
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	w.Write(marshaledJson)
+
+}
+
+func ImportFilmHandler(w http.ResponseWriter, r *http.Request) {}
+
+func DeleteFilmHandler(w http.ResponseWriter, r *http.Request) {
+
+}
+
+func GetFilmsHandler(w http.ResponseWriter, r *http.Request) {
+	var films = models.GetAllFilms()
+
+	marshaledJson, err := json.Marshal(films)
+
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	w.Write(marshaledJson)
+}
