@@ -51,7 +51,7 @@ func (s *APIServer) configureLogger() error {
 func (s *APIServer) configureRouter() {
 	s.router.HandleFunc("/film", s.addFilm()).Methods("POST")
 	s.router.HandleFunc("/films/from-file", s.importFilm()).Methods("POST")
-	s.router.HandleFunc("/film/:filmId", s.deleteFilm()).Methods("DELETE")
+	s.router.HandleFunc("/film/{filmId}", s.deleteFilm()).Methods("DELETE")
 	s.router.HandleFunc("/films", s.getFilms()).Methods("GET")
 }
 
@@ -91,7 +91,30 @@ func (s *APIServer) importFilm() http.HandlerFunc {
 
 func (s *APIServer) deleteFilm() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		io.WriteString(w, "film deleted")
+		var film models.Film
+
+		vars := mux.Vars(r)
+		filmId := vars["filmId"]
+
+		var db = config.GetDatabase()
+		result := db.Where("ID=?", filmId).Delete(film)
+
+		if result.Error != nil {
+			s.logger.Error(result.Error)
+			w.WriteHeader(http.StatusServiceUnavailable)
+		}
+
+		marshaledJson, err := json.Marshal(film)
+
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+
+		fmt.Print(marshaledJson)
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusOK)
+		w.Write(marshaledJson)
 	}
 }
 
