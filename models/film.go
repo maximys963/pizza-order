@@ -25,9 +25,8 @@ func GetAllFilms() []Film {
 	return films
 }
 
-func AddFilm() Film {
+func AddFilm(film Film) Film {
 	var db = config.GetDatabase()
-	var film Film
 
 	result := db.Create(film)
 

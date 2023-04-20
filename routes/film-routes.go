@@ -6,8 +6,8 @@ import (
 )
 
 func RegisterFilmsRoutes(router *mux.Router) {
-	router.HandleFunc("/film", controllers.AddFilm).Methods("POST")
-	router.HandleFunc("/films/from-file", controllers.ImportFilm).Methods("POST")
-	router.HandleFunc("/film/{filmId}", controllers.DeleteFilm).Methods("DELETE")
-	router.HandleFunc("/films", controllers.GetFilms).Methods("GET")
+	router.HandleFunc("/film", controllers.AddFilmHandler).Methods("POST")
+	router.HandleFunc("/films/from-file", controllers.ImportFilmHandler).Methods("POST")
+	router.HandleFunc("/film/{filmId}", controllers.DeleteFilmHandler).Methods("DELETE")
+	router.HandleFunc("/films", controllers.GetFilmsHandler).Methods("GET")
 }

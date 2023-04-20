@@ -11,9 +11,9 @@ func AddFilmHandler(w http.ResponseWriter, r *http.Request) {
 	var film models.Film
 	_ = json.NewDecoder(r.Body).Decode(&film)
 
-	var addedFilm = models.AddFilm()
+	models.AddFilm(film)
 
-	marshaledJson, err := json.Marshal(addedFilm)
+	marshaledJson, err := json.Marshal(film)
 
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
