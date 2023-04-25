@@ -47,6 +47,4 @@ func (s *APIServer) configureRouter() {
 	routes.RegisterFilmsRoutes(s.router)
 }
 
-// TODO: move it to controller
-
 // TODO: create repository
